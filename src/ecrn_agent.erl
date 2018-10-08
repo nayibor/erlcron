@@ -190,13 +190,18 @@ until_next_milliseconds(State, Job) ->
     end.
 
 normalize_seconds(State, Seconds) ->
-    case Seconds - current_time(State) of
-        Value when Value >= 0 ->
+	try
+		case Seconds - current_time(State) of
+			Value when Value >= 0 ->
             Value;
         _ ->
-            erlang:display(erlang:get_stacktrace()),
             throw(invalid_once_exception)
-    end.
+        end
+	catch
+	   _:_:Stacktrace ->
+	      erlang:display(Stacktrace)
+	end.
+
 
 %% @doc Calculates the duration in seconds until the next time
 %% a job is to be run.
